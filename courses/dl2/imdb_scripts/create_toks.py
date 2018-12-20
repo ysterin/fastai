@@ -26,7 +26,7 @@ def get_texts(df, n_lbls, lang='en'):
         for i in range(n_lbls+1, len(df.columns)): texts += f' {FLD} {i-n_lbls+1} ' + df[i].astype(str)
     texts = list(texts.apply(fixup).values)
 
-    tok = Tokenizer().proc_all(texts)
+    tok = Tokenizer().process_all(texts)
     return tok, list(labels)
 
 
