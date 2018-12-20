@@ -33,7 +33,7 @@ def get_texts(df, n_lbls, lang='en'):
 def get_all(df, n_lbls, lang='en'):
     tok, labels = [], []
     for i, r in enumerate(df):
-        print(i)
+        print(i, ' / ', len(df))
         tok_, labels_ = get_texts(r, n_lbls, lang=lang)
         tok += tok_
         labels += labels_
