@@ -58,15 +58,18 @@ def create_toks(dir_path, chunksize=24000, n_lbls=1, lang='en', n_cpus=None):
     tmp_path = dir_path / 'tmp'
     tmp_path.mkdir(exist_ok=True)
     tok_trn, trn_labels = get_all(df_trn, n_lbls, lang=lang, n_cpus=n_cpus)
-    tok_val, val_labels = get_all(df_val, n_lbls, lang=lang, n_cpus=n_cpus)
 
     np.save(tmp_path / 'tok_trn.npy', tok_trn)
+    trn_joined = [' '.join(o) for o in tok_trn]
+    open(tmp_path / 'joined.txt', 'w', encoding='utf-8').writelines(trn_joined)
+    del tok_trn
+    del trn_joined
+    tok_val, val_labels = get_all(df_val, n_lbls, lang=lang, n_cpus=n_cpus)
     np.save(tmp_path / 'tok_val.npy', tok_val)
     np.save(tmp_path / 'lbl_trn.npy', trn_labels)
     np.save(tmp_path / 'lbl_val.npy', val_labels)
 
-    trn_joined = [' '.join(o) for o in tok_trn]
-    open(tmp_path / 'joined.txt', 'w', encoding='utf-8').writelines(trn_joined)
+
 
 
 if __name__ == '__main__': fire.Fire(create_toks)
