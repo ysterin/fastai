@@ -16,7 +16,7 @@ def fixup(x):
     return re1.sub(' ', html.unescape(x))
 
 
-def get_texts(df, n_lbls, lang='en'):
+def get_texts(df, n_lbls, lang='en', n_cpus=None):
     if len(df.columns) == 1:
         labels = []
         texts = f'\n{BOS} {FLD} 1 ' + df[0].astype(str)
@@ -26,21 +26,21 @@ def get_texts(df, n_lbls, lang='en'):
         for i in range(n_lbls+1, len(df.columns)): texts += f' {FLD} {i-n_lbls+1} ' + df[i].astype(str)
     texts = list(texts.apply(fixup).values)
 
-    tok = Tokenizer().process_all(texts)
+    tok = Tokenizer(n_cpus=n_cpus).process_all(texts)
     return tok, list(labels)
 
 
-def get_all(df, n_lbls, lang='en'):
+def get_all(df, n_lbls, lang='en', n_cpus=None):
     tok, labels = [], []
     for i, r in enumerate(df):
         print(i)
-        tok_, labels_ = get_texts(r, n_lbls, lang=lang)
+        tok_, labels_ = get_texts(r, n_lbls, lang=lang, n_cpus=n_cpus)
         tok += tok_
         labels += labels_
     return tok, labels
 
 
-def create_toks(dir_path, chunksize=24000, n_lbls=1, lang='en'):
+def create_toks(dir_path, chunksize=24000, n_lbls=1, lang='en', n_cpus=None):
     print(f'dir_path {dir_path} chunksize {chunksize} n_lbls {n_lbls} lang {lang}')
     try:
         spacy.load(lang)
@@ -57,8 +57,8 @@ def create_toks(dir_path, chunksize=24000, n_lbls=1, lang='en'):
 
     tmp_path = dir_path / 'tmp'
     tmp_path.mkdir(exist_ok=True)
-    tok_trn, trn_labels = get_all(df_trn, n_lbls, lang=lang)
-    tok_val, val_labels = get_all(df_val, n_lbls, lang=lang)
+    tok_trn, trn_labels = get_all(df_trn, n_lbls, lang=lang, n_cpus=n_cpus)
+    tok_val, val_labels = get_all(df_val, n_lbls, lang=lang, n_cpus=n_cpus)
 
     np.save(tmp_path / 'tok_trn.npy', tok_trn)
     np.save(tmp_path / 'tok_val.npy', tok_val)
